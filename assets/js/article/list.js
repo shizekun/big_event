@@ -32,6 +32,10 @@ $(function () {
             if (res.status !== 0) {
                 return layer.msg('获取失败!')
             }
+            // 调用模板函数之前去注册过滤器
+            template.defaults.imports.dateFormat = function (date) {
+                return moment(date).format('YYYY/MM/DD HH:mm:ss')
+            }
             // 3.2使用模板引擎来渲染
             const htmlStr = template('tpl', res)
             console.log(htmlStr);
@@ -77,6 +81,8 @@ $(function () {
         // 5.2把获取到的值重新赋值给query对象
         query.cate_id = cate_id
         query.state = state
+        // 优化： 发送请求之前去修改页码值为第一页1
+        query.pagenum = 1
         //5.2 重新调用一下渲染表格的方法
         renderTable()
     })
@@ -104,7 +110,16 @@ $(function () {
             layer.close(index)
         })
     })
+    // 7.点击编辑按钮，跳转到文章编辑页面
+    $(document).on('click', '.edit-btn', function () {
+        // 获取当前文章id
+        const id = $(this).data('id')
+        // 如何在两个页面之间进行数据传递：使用查询参数 ?name=tom&age=10
+        location.href = `./edit.html?id=${id}`
+        // 左侧导航更新
+        window.parent.$('.layui-this').next().find('a').click()
 
+    })
 
 
 
